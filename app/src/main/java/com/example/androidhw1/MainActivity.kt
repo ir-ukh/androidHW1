@@ -11,7 +11,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ItemAdapter
-    private val keyCount = "key_count"
+    private val keyItems = "key_items"
+    private val keyStack = "key_stack"
+    private val keyNext = "key_next"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,19 +26,20 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = GridLayoutManager(this, columns)
         recyclerView.adapter = adapter
 
-        val savedCount = savedInstanceState?.getInt(keyCount) ?: 0
-        if (savedCount > 0) {
-            adapter.restoreItems(savedCount)
+        val savedItems = savedInstanceState?.getIntegerArrayList(keyItems)
+        val savedStack = savedInstanceState?.getIntegerArrayList(keyStack)
+        val savedNext = savedInstanceState?.getInt(keyNext) ?: 0
+        if (savedItems != null && savedStack != null) {
+            adapter.restoreState(savedItems, savedStack, savedNext)
         }
-
         val addButton = findViewById<FloatingActionButton>(R.id.addButton)
         addButton.setOnClickListener {
-            adapter.addItem()
-        }
-    }
+            adapter.handleAddClick()}}// новый варик
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(keyCount, adapter.getCount())
+        outState.putIntegerArrayList(keyItems, adapter.getItemsList())
+        outState.putIntegerArrayList(keyStack, adapter.getDeletedStack())
+        outState.putInt(keyNext, adapter.getNextNumber())
     }
 }
